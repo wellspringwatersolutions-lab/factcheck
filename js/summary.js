@@ -1,9 +1,9 @@
 const VERDICT_ORDER = [
   "supported",
-  "contradicted",
-  "unverified",
-  "conflicting",
   "hypothesis",
+  "conflicting",
+  "unverified",
+  "contradicted",
 ];
 
 const VERDICT_WORDS = {

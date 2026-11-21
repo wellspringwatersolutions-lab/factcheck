@@ -325,7 +325,7 @@ function renderLegend() {
   fact.append(el("strong", null, "Fact"));
   fact.append(
     document.createTextNode(
-      " Colored from red to teal by how well it holds up. Supported only when a quoted source or tool result backs it.",
+      " Colored from teal (most true) to red (least true). Supported only when a quoted source or tool result backs it.",
     ),
   );
   const opinion = el("p", "swatch swatch-opinion");
@@ -339,7 +339,7 @@ function renderLegend() {
   section.append(grid);
 
   const key = el("ul", "verdict-key");
-  for (const verdict of ["unverified", "contradicted", "conflicting", "hypothesis", "supported"]) {
+  for (const verdict of ["supported", "hypothesis", "conflicting", "unverified", "contradicted"]) {
     const item = el("li");
     item.append(el("span", `hl hl-fact hl-${verdict}`, verdictLabel(verdict)));
     key.append(item);
@@ -352,7 +352,7 @@ function renderLegend() {
     el(
       "p",
       "legend-note",
-      "Facts run from red (worst) to teal (best). Opinions stay copper and are not given those verdicts.",
+      "Ranked from most true (teal) to least true (red). Opinions stay copper and are not given those verdicts.",
     ),
   );
   return section;
