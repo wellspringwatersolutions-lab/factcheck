@@ -27,18 +27,17 @@ export function buildReport(text) {
   return addOffsets(report, input);
 }
 
-export async function checkClaims(text) {
-  const input = typeof text === "string" ? text : "";
+const POLL_MS = 2000;
+const JOB_TIMEOUT_MS = 180000; // background checks get up to two minutes
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function fetchJson(url, options) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   let response;
   try {
-    response = await fetch(`${API_BASE}/check`, {
-      method: "POST",
-      headers: { "content-type": "application/json", accept: "application/json" },
-      body: JSON.stringify({ text: input }),
-      signal: controller.signal,
-    });
+    response = await fetch(url, { ...options, signal: controller.signal });
   } catch (err) {
     throw new Error(
       err && err.name === "AbortError"
@@ -51,8 +50,39 @@ export async function checkClaims(text) {
   let body = null;
   try { body = await response.json(); } catch { body = null; }
   if (!response.ok) {
-    const message = body && body.error && body.error.message;
-    throw new Error(message || "The check could not be finished. Try again.");
+    const message = body && body.error && (body.error.message || body.error);
+    throw new Error(typeof message === "string" ? message : "The check could not be finished. Try again.");
   }
-  return addOffsets(body || { claims: [] }, input);
+  return { status: response.status, body };
+}
+
+/* Starts a background check and polls until it's done. onProgress gets {done, total}. */
+export async function checkClaims(text, onProgress) {
+  const input = typeof text === "string" ? text : "";
+  const started = await fetchJson(`${API_BASE}/check`, {
+    method: "POST",
+    headers: { "content-type": "application/json", accept: "application/json" },
+    body: JSON.stringify({ text: input, async: true }),
+  });
+  // Older servers answer right away with the report.
+  if (!(started.body && started.body.job_id)) return addOffsets(started.body || { claims: [] }, input);
+  const jobId = started.body.job_id;
+  const deadline = Date.now() + JOB_TIMEOUT_MS;
+  while (Date.now() < deadline) {
+    await sleep(POLL_MS);
+    let job;
+    try {
+      job = (await fetchJson(`${API_BASE}/v1/jobs/${encodeURIComponent(jobId)}`, { headers: { accept: "application/json" } })).body;
+    } catch (err) {
+      continue; // a brief network blip shouldn't end the check
+    }
+    if (!job) continue;
+    if (job.progress && typeof onProgress === "function") onProgress(job.progress);
+    if (job.status === "done" && job.report) return addOffsets(job.report, input);
+    if (job.status === "error") {
+      const message = job.error && (job.error.message || job.error);
+      throw new Error(typeof message === "string" ? message : "The check could not be finished. Try again.");
+    }
+  }
+  throw new Error("The check took too long. Try again in a minute.");
 }

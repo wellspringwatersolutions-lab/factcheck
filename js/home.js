@@ -188,7 +188,9 @@ form.addEventListener("submit", async (event) => {
     block: "nearest",
   });
   try {
-    const report = demoMode() ? await previewReport(text) : await checkClaims(text);
+    const report = demoMode() ? await previewReport(text) : await checkClaims(text, (p) => {
+          if (p && p.total) button.textContent = `Checking… ${p.done} of ${p.total} claims`;
+        });
     stop();
     const reveal = () => {
       if (location.hash) {
