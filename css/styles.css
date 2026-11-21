@@ -731,6 +731,55 @@ blockquote {
   color: var(--ink);
 }
 
+.doc p {
+  margin: 0 0 0.85rem;
+}
+
+.doc a {
+  color: var(--fact-700);
+  text-underline-offset: 3px;
+}
+
+.doc ul {
+  margin: 0 0 1rem;
+  padding-left: 1.2rem;
+}
+
+.doc li {
+  margin: 0 0 0.35rem;
+}
+
+.doc code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  background: var(--paper);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+.doc pre {
+  overflow-x: auto;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.doc pre code {
+  background: none;
+  padding: 0;
+}
+
+.steps h2 {
+  margin-top: 0.9rem;
+}
+
+.steps p {
+  color: var(--muted);
+}
+
 .steps {
   margin: 8px 0 0;
   padding: 0;

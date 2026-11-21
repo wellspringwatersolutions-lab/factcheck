@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <meta name="description" content="Coming soon.">
+  <meta name="description" content="Live FactCheck API and MCP plug-in for AI agents.">
   <title>For AI agents</title>
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../css/styles.css">
@@ -25,7 +25,44 @@
   </header>
   <main id="main" class="doc">
     <h1>For AI agents</h1>
-    <p class="coming">Coming soon</p>
+    <p>FactCheck is live. You can check a passage through the HTTP API or the MCP plug-in. A supported verdict is shown only when a quoted passage or a tool result backs the claim. Opinions are reported as what mainstream fact-checkers say, never as true or false. A verdict is not proof.</p>
+    <p>Start with the API's own instructions: <a href="https://factcheck-mim7.onrender.com/llms.txt">https://factcheck-mim7.onrender.com/llms.txt</a>. API docs are at <a href="https://factcheck-mim7.onrender.com/docs">/docs</a>. The live OpenAPI spec is at <a href="https://factcheck-mim7.onrender.com/openapi.json">/openapi.json</a>. Health is at <a href="https://factcheck-mim7.onrender.com/health">/health</a>.</p>
+
+    <h2>MCP plug-in</h2>
+    <p>The MCP server is live. In Claude or Cursor, add:</p>
+    <pre><code>https://factcheck-mim7.onrender.com/mcp</code></pre>
+    <p>Tools: <code>verify_text</code>, <code>verify_claims</code>, and <code>get_verification</code>. The live manifest is at <a href="https://factcheck-mim7.onrender.com/.well-known/mcp.json">/.well-known/mcp.json</a>.</p>
+
+    <h2>HTTP API</h2>
+    <p>Base URL: <a href="https://factcheck-mim7.onrender.com">https://factcheck-mim7.onrender.com</a></p>
+    <ul>
+      <li><code>POST /check</code> or <code>POST /v1/verify</code> — send JSON with <code>text</code> (a passage) or <code>claims</code> (a list of strings). You may also send <code>question</code>.</li>
+      <li>Set <code>async</code> to <code>true</code> to start a background job, then poll <code>GET /v1/jobs/{job_id}</code> until status is <code>done</code>.</li>
+      <li><code>GET /v1/verification/{id}</code> — fetch a stored result.</li>
+      <li><code>GET /v1/verification/{id}/report</code> — fetch a printable report.</li>
+    </ul>
+    <pre><code>POST https://factcheck-mim7.onrender.com/check
+Content-Type: application/json
+
+{
+  "text": "Your passage here",
+  "async": true
+}</code></pre>
+    <p>The website form uses that same <code>POST /check</code> call, with no API key.</p>
+
+    <h2>Pricing and keys</h2>
+    <p>One free check per client, with no sign-up and no key. Paid plans are coming soon. Paid keys, when they go on sale, will use the <code>Authorization</code> or <code>X-API-Key</code> header. Buying credits is not available yet.</p>
+
+    <h2>Verdicts</h2>
+    <p>In this order, from strongest support to least:</p>
+    <ul>
+      <li>supported</li>
+      <li>hypothesis (supported by evidence)</li>
+      <li>opinion</li>
+      <li>conflicting</li>
+      <li>unverified</li>
+    </ul>
+    <p>Do not label an opinion true or false. The API may still return the value <code>contradicted</code>; treat that as conflicting.</p>
   </main>
   <footer class="site-footer">
     <nav aria-label="Footer">

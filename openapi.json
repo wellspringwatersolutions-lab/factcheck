@@ -1,181 +1,204 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.1.0",
   "info": {
     "title": "FactCheck API",
-    "version": "0.0.0-stub",
-    "description": "Stub specification. No server is implemented.\n\nThe check operation splits an AI-generated answer into claims. A fact is supported only when a quoted source passage or a tool result backs it. Opinions are not labeled true or false: read mainstream_check for what mainstream fact-checkers say, and do not present verdict on an opinion as a truth stamp. strength_of_support is the strength of the evidence for that claim, from 0 to 1. The report has no overall score."
+    "version": "0.1.0",
+    "description": "Live FactCheck API.\n\nThe canonical OpenAPI document is https://factcheck-mim7.onrender.com/openapi.json. Agent instructions: https://factcheck-mim7.onrender.com/llms.txt. MCP server: https://factcheck-mim7.onrender.com/mcp.\n\nPOST /check and POST /v1/verify accept the same body. Send `text` or `claims`. Set `async` to true to start a background job, then poll GET /v1/jobs/{job_id}.\n\nOne free check per client, no key required. Paid plans are coming soon. Paid keys, when they go on sale, will use the Authorization or X-API-Key header. Buying credits is not available yet.\n\nVerdicts, from strongest support to least: supported, hypothesis (supported by evidence), opinion, conflicting, unverified. The API may still return `contradicted`; treat that as conflicting. A supported verdict requires a quoted passage or a tool result. Opinions are reported as what mainstream fact-checkers say, not as true or false. A verdict is not proof."
   },
   "servers": [
     {
-      "url": ".",
-      "description": "Not deployed. Relative to this document so a project-site subfolder still resolves."
+      "url": "https://factcheck-mim7.onrender.com"
     }
   ],
   "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "Service status."
+          }
+        }
+      }
+    },
+    "/llms.txt": {
+      "get": {
+        "summary": "Agent instructions",
+        "operationId": "llmsTxt",
+        "responses": {
+          "200": {
+            "description": "Plain-text instructions for AI agents."
+          }
+        }
+      }
+    },
+    "/.well-known/mcp.json": {
+      "get": {
+        "summary": "MCP manifest",
+        "operationId": "mcpManifest",
+        "responses": {
+          "200": {
+            "description": "Live MCP plug-in manifest."
+          }
+        }
+      }
+    },
     "/check": {
       "post": {
-        "operationId": "checkClaims",
-        "summary": "Check claims in an AI-generated answer",
-        "description": "Not implemented. The static site calls a local stub with the same request body.",
+        "summary": "Check claims in a passage",
+        "operationId": "check",
+        "description": "Same request body as POST /v1/verify. With `async` set to true, the response may include a `job_id` to poll at GET /v1/jobs/{job_id}.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": ["text"],
-                "properties": {
-                  "text": {
-                    "type": "string",
-                    "description": "The AI-generated answer or claim to check."
-                  }
-                }
+                "$ref": "#/components/schemas/VerifyIn"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "A claim-by-claim report.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CheckReport"
-                }
+            "description": "A report, or a job id when async is true."
+          }
+        }
+      }
+    },
+    "/v1/verify": {
+      "post": {
+        "summary": "Verify a passage or a list of claims",
+        "operationId": "verify",
+        "description": "Same request body and behavior as POST /check.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyIn"
               }
             }
-          },
-          "501": {
-            "description": "This static site does not implement the endpoint."
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A report, or a job id when async is true."
+          }
+        }
+      }
+    },
+    "/v1/jobs/{job_id}": {
+      "get": {
+        "summary": "Get a background check job",
+        "operationId": "getJob",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job status, and the report when status is done."
+          }
+        }
+      }
+    },
+    "/v1/verification/{verification_id}": {
+      "get": {
+        "summary": "Get a stored verification",
+        "operationId": "getVerification",
+        "parameters": [
+          {
+            "name": "verification_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A stored verification result."
+          }
+        }
+      }
+    },
+    "/v1/verification/{verification_id}/report": {
+      "get": {
+        "summary": "Get a printable verification report",
+        "operationId": "getVerificationReport",
+        "parameters": [
+          {
+            "name": "verification_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An HTML report."
           }
         }
       }
     }
   },
   "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "Paid keys are not on sale yet. The free check does not need a key."
+      },
+      "Authorization": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Paid keys are not on sale yet. The free check does not need a key."
+      }
+    },
     "schemas": {
-      "CheckReport": {
+      "VerifyIn": {
         "type": "object",
-        "required": ["claims"],
+        "additionalProperties": false,
         "properties": {
-          "input_text": {
-            "type": "string",
-            "description": "The text that was checked."
+          "text": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The passage or AI-generated answer to check."
           },
           "claims": {
-            "type": "array",
+            "type": [
+              "array",
+              "null"
+            ],
             "items": {
-              "$ref": "#/components/schemas/Claim"
-            }
-          }
-        }
-      },
-      "Claim": {
-        "type": "object",
-        "required": [
-          "claim",
-          "claim_type",
-          "claim_category",
-          "verdict",
-          "strength_of_support",
-          "sources"
-        ],
-        "properties": {
-          "claim": {
-            "type": "string"
+              "type": "string"
+            },
+            "description": "A list of claims to check instead of, or along with, a passage."
           },
-          "claim_type": {
-            "type": "string",
-            "enum": ["fact", "opinion"]
+          "question": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
-          "claim_category": {
-            "type": "string",
-            "description": "Short category such as event, measurement, scientific, quantity, prediction, or policy."
-          },
-          "verdict": {
-            "type": "string",
-            "enum": ["supported", "likely_true", "contradicted", "unverified", "conflicting", "hypothesis"],
-            "description": "For opinions, do not render this as true or false. Use mainstream_check."
-          },
-          "strength_of_support": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1,
-            "description": "How strongly the evidence supports this claim. Not an overall score for the answer."
-          },
-          "start": {
-            "type": "integer",
-            "description": "Optional start offset of the claim in input_text."
-          },
-          "end": {
-            "type": "integer",
-            "description": "Optional end offset of the claim in input_text."
-          },
-          "sources": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Source"
-            }
-          },
-          "mainstream_check": {
-            "$ref": "#/components/schemas/MainstreamCheck"
-          }
-        }
-      },
-      "Source": {
-        "type": "object",
-        "required": ["url", "quote", "source_type"],
-        "properties": {
-          "url": {
-            "type": "string"
-          },
-          "quote": {
-            "type": "string"
-          },
-          "source_type": {
-            "type": "string",
-            "description": "For example primary_document, audit_report, fact_checker, or tool_result."
-          },
-          "title": {
-            "type": "string"
-          },
-          "checked_on": {
-            "type": "string",
-            "format": "date",
-            "description": "Day the source was checked."
-          }
-        }
-      },
-      "MainstreamCheck": {
-        "type": "object",
-        "description": "What mainstream fact-checkers say about an opinion. Not a true or false stamp.",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "publisher": {
-                  "type": "string"
-                },
-                "rating_label": {
-                  "type": "string",
-                  "description": "The fact-checker's own rating words."
-                },
-                "reason": {
-                  "type": "string"
-                },
-                "url": {
-                  "type": "string"
-                },
-                "title": {
-                  "type": "string"
-                },
-                "quote": {
-                  "type": "string"
-                }
-              }
-            }
+          "async": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, start a background job and return a job_id to poll."
           }
         }
       }

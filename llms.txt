@@ -1,20 +1,67 @@
 # FactCheck
 
-> Splits an AI-generated answer into claims. Facts are supported only by a quoted passage or a tool result. Opinions are reported as what mainstream fact-checkers say, never as true or false. Strength of support is per claim, from the evidence. There is no overall score. This file is a stub. The check API is not live.
+> Splits text into claims and checks them against sources. A supported verdict is shown only when a quoted passage or a tool result backs the claim. Opinions are reported as what mainstream fact-checkers say, never as true or false. Strength of support is per claim. There is no overall score. A verdict is not proof.
 
-The home page offers one free check with no sign-up. The button calls a local stub and returns placeholder results. Nothing is uploaded.
+The check API and MCP plug-in are live.
+
+- Website: https://wellspringwatersolutions-lab.github.io/factcheck/
+- API: https://factcheck-mim7.onrender.com
+- MCP: https://factcheck-mim7.onrender.com/mcp
+
+Use the API's own agent instructions first: https://factcheck-mim7.onrender.com/llms.txt
+
+Also available:
+
+- API docs: https://factcheck-mim7.onrender.com/docs
+- OpenAPI: https://factcheck-mim7.onrender.com/openapi.json
+- Health: https://factcheck-mim7.onrender.com/health
+- MCP manifest: https://factcheck-mim7.onrender.com/.well-known/mcp.json
+
+## Use from an agent
+
+Install the MCP server in Claude or Cursor:
+
+    add https://factcheck-mim7.onrender.com/mcp to Claude/Cursor
+
+MCP tools: verify_text, verify_claims, get_verification.
+
+Or call the HTTP API:
+
+- POST https://factcheck-mim7.onrender.com/check
+- POST https://factcheck-mim7.onrender.com/v1/verify
+
+Send JSON with `text` (a passage) or `claims` (a list of strings). You may also send `question`. Set `async` to true to start a background job, then poll GET https://factcheck-mim7.onrender.com/v1/jobs/{job_id} until status is `done`. Fetch a stored result at GET /v1/verification/{id}, or a printable report at GET /v1/verification/{id}/report.
+
+The website form uses POST /check with `{ "text": "...", "async": true }` and no API key.
+
+## Pricing
+
+One free check per client, with no sign-up and no key. Paid plans are coming soon. Paid keys, when they go on sale, will use the Authorization or X-API-Key header. Buying credits is not available yet.
+
+## Verdicts
+
+In this order, from strongest support to least:
+
+- supported
+- hypothesis (supported by evidence)
+- opinion
+- conflicting
+- unverified
+
+Do not label an opinion true or false. The API may still return the value `contradicted`; treat that as conflicting.
 
 ## Pages
 
-- [Home](index.html): Paste an answer and check it
-- [How it works](how-it-works/): Placeholder
-- [For AI agents](for-agents/): Placeholder
-- [Pricing](pricing/): Placeholder
-- [Terms](terms/): Placeholder
-- [Privacy](privacy/): Placeholder
+- [Home](https://wellspringwatersolutions-lab.github.io/factcheck/): paste an answer and run one free check
+- [How it works](how-it-works/)
+- [For AI agents](for-agents/)
+- [Pricing](pricing/)
+- [Terms](terms/)
+- [Privacy](privacy/)
 
 ## Machine-readable
 
-- [OpenAPI stub](openapi.json): the check operation
-- [Agent card](.well-known/agent-card.json): Placeholder discovery card
-- [MCP stub](.well-known/mcp.json): Placeholder plug-in manifest
+- Live OpenAPI: https://factcheck-mim7.onrender.com/openapi.json
+- Site OpenAPI pointer: openapi.json
+- Agent card: .well-known/agent-card.json
+- MCP manifest (live): https://factcheck-mim7.onrender.com/.well-known/mcp.json

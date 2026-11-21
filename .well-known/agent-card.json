@@ -1,19 +1,36 @@
 {
-  "schema_version": "0.1-stub",
+  "schema_version": "0.1",
   "name": "FactCheck",
-  "description": "Claim-level checks for AI-generated answers. Stub discovery file. No agent endpoint is live.",
-  "documentation": "../llms.txt",
-  "openapi": "../openapi.json",
+  "description": "Claim-level checks for AI-generated answers and other text. A supported verdict requires a quoted passage or a tool result. Opinions are reported as what mainstream fact-checkers say, not as true or false.",
+  "url": "https://factcheck-mim7.onrender.com",
+  "documentation": "https://factcheck-mim7.onrender.com/llms.txt",
+  "site_documentation": "https://wellspringwatersolutions-lab.github.io/factcheck/llms.txt",
+  "openapi": "https://factcheck-mim7.onrender.com/openapi.json",
+  "health": "https://factcheck-mim7.onrender.com/health",
   "capabilities": {
     "check": {
+      "status": "live",
       "method": "POST",
-      "path": "../check",
-      "status": "not_implemented",
-      "free_check_without_signup": "planned"
+      "url": "https://factcheck-mim7.onrender.com/check",
+      "alternate_url": "https://factcheck-mim7.onrender.com/v1/verify",
+      "jobs": "https://factcheck-mim7.onrender.com/v1/jobs/{job_id}",
+      "verification": "https://factcheck-mim7.onrender.com/v1/verification/{id}",
+      "free_check_without_signup": true,
+      "paid_plans": "coming soon"
     },
     "mcp": {
-      "status": "not_implemented",
-      "manifest": "mcp.json"
+      "status": "live",
+      "url": "https://factcheck-mim7.onrender.com/mcp",
+      "manifest": "https://factcheck-mim7.onrender.com/.well-known/mcp.json",
+      "install": "add https://factcheck-mim7.onrender.com/mcp to Claude/Cursor",
+      "tools": ["verify_text", "verify_claims", "get_verification"]
     }
-  }
+  },
+  "verdicts": [
+    "supported",
+    "hypothesis",
+    "opinion",
+    "conflicting",
+    "unverified"
+  ]
 }

@@ -1,16 +1,11 @@
 {
-  "schema_version": "0.1-stub",
   "name": "FactCheck",
-  "status": "placeholder",
-  "description": "A future MCP plug-in will expose a check tool. Nothing here is callable.",
-  "tools": [
-    {
-      "name": "check",
-      "description": "Split an AI-generated answer into claims and return fact and opinion checks. Not implemented.",
-      "status": "not_implemented",
-      "input": {
-        "text": "string"
-      }
-    }
-  ]
+  "status": "live",
+  "description": "Fact-checking for agents. Supported verdicts require a quoted passage or a tool result. Opinions are reported as what mainstream fact-checkers say, not as true or false.",
+  "mcp_endpoint": "https://factcheck-mim7.onrender.com/mcp",
+  "install": "add https://factcheck-mim7.onrender.com/mcp to Claude/Cursor",
+  "tools": ["verify_text", "verify_claims", "get_verification"],
+  "docs": "https://factcheck-mim7.onrender.com/llms.txt",
+  "openapi": "https://factcheck-mim7.onrender.com/openapi.json",
+  "disclaimer": "Evidence summarized by FactCheck. Grounding reduces errors. It cannot prove that no better evidence exists, and a verdict is not proof."
 }
