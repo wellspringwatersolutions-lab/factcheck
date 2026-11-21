@@ -78,9 +78,9 @@ form.addEventListener("submit", async (event) => {
       behavior: reducedMotion() ? "auto" : "smooth",
       block: "nearest",
     });
-  } catch {
+  } catch (err) {
     pending.hidden = true;
-    showError("The check could not be finished. Try again.");
+    showError((err && err.message) || "The check could not be finished. Try again.");
     status.textContent = "The check could not be finished.";
   } finally {
     button.disabled = false;
