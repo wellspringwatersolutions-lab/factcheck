@@ -6,7 +6,7 @@ const VERDICT_ORDER = [
 ];
 
 const VERDICT_WORDS = {
-  supported: ["supported", "supported"],
+  supported: ["fact", "facts"],
   contradicted: ["contradicted", "contradicted"],
   unverified: ["unverified", "unverified"],
   conflicting: ["conflicting", "conflicting"],

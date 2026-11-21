@@ -14,7 +14,7 @@ const CATEGORIES = {
 };
 
 const VERDICT_LABELS = {
-  supported: "Supported",
+  supported: "Fact",
   contradicted: "Contradicted",
   unverified: "Unverified",
   conflicting: "Conflicting",
@@ -175,7 +175,7 @@ function renderPassage(container, text, claims) {
     link.title =
       range.claim.claim_type === "opinion"
         ? "Opinion. Show this claim."
-        : `Fact, ${verdictLabel(range.claim.verdict)}. Show this claim.`;
+        : `Claim, ${verdictLabel(range.claim.verdict)}. Show this claim.`;
     link.append(document.createTextNode(text.slice(range.start, range.end)));
     link.append(
       el(
@@ -183,7 +183,7 @@ function renderPassage(container, text, claims) {
         "visually-hidden",
         range.claim.claim_type === "opinion"
           ? " Opinion. Opens the claim card."
-          : ` Fact, ${verdictLabel(range.claim.verdict)}. Opens the claim card.`,
+          : ` Claim, ${verdictLabel(range.claim.verdict)}. Opens the claim card.`,
       ),
     );
     paragraph.append(link);
@@ -304,7 +304,7 @@ function renderCard(claim) {
   const kicker = el(
     "p",
     "card-kicker",
-    `${opinion ? "Opinion" : "Fact"} · ${categoryLabel(claim.claim_category)}`,
+    `${opinion ? "Opinion" : "Claim"} · ${categoryLabel(claim.claim_category)}`,
   );
   card.append(kicker);
   card.append(el("h3", "claim-text", claim.claim));
@@ -322,10 +322,10 @@ function renderLegend() {
 
   const grid = el("div", "legend");
   const fact = el("p", "swatch swatch-fact");
-  fact.append(el("strong", null, "Fact"));
+  fact.append(el("strong", null, "Claims"));
   fact.append(
     document.createTextNode(
-      " Colored from teal (most true) to red (least true). Supported only when a quoted source or tool result backs it.",
+      " Colored from teal (most true) to red (least true). Marked Fact only when a quoted source or tool result backs it.",
     ),
   );
   const opinion = el("p", "swatch swatch-opinion");
