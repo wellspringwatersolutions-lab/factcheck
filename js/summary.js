@@ -1,13 +1,15 @@
 const VERDICT_ORDER = [
   "supported",
   "hypothesis",
+  "opinion",
   "conflicting",
+  "contradicted",
   "unverified",
 ];
 
 const VERDICT_WORDS = {
   supported: ["fact", "facts"],
-  contradicted: ["contradicted", "contradicted"],
+  contradicted: ["false", "false"],
   unverified: ["unverified", "unverified"],
   conflicting: ["conflicting", "conflicting"],
   hypothesis: ["hypothesis", "hypotheses"],
@@ -27,7 +29,7 @@ export function summarize(claims) {
       opinions += 1;
       continue;
     }
-    const v = claim.verdict === "contradicted" ? "conflicting" : claim.verdict;
+    const v = claim.verdict;
     if (Object.prototype.hasOwnProperty.call(counts, v)) {
       counts[v] += 1;
     }
@@ -39,13 +41,14 @@ export function summaryLine(claims) {
   const { counts, opinions } = summarize(claims);
   const parts = [];
   for (const verdict of VERDICT_ORDER) {
+    if (verdict === "opinion") {
+      if (opinions) parts.push(`${opinions} ${opinions === 1 ? "opinion" : "opinions"}`);
+      continue;
+    }
     const n = counts[verdict];
     if (!n) continue;
     const [one, many] = VERDICT_WORDS[verdict];
     parts.push(`${n} ${n === 1 ? one : many}`);
-  }
-  if (opinions) {
-    parts.push(`${opinions} ${opinions === 1 ? "opinion" : "opinions"}`);
   }
   return parts.join(", ");
 }

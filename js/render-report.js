@@ -15,7 +15,7 @@ const CATEGORIES = {
 
 const VERDICT_LABELS = {
   supported: "Fact",
-  contradicted: "Contradicted",
+  contradicted: "False",
   unverified: "Unverified",
   conflicting: "Conflicting",
   hypothesis: "Hypothesis",
@@ -339,20 +339,18 @@ function renderLegend() {
   section.append(grid);
 
   const key = el("ul", "verdict-key");
-  for (const verdict of ["supported", "hypothesis", "conflicting", "unverified"]) {
+  for (const verdict of ["supported", "hypothesis", "opinion", "conflicting", "contradicted", "unverified"]) {
     const item = el("li");
-    item.append(el("span", `hl hl-fact hl-${verdict}`, verdictLabel(verdict)));
+    if (verdict === "opinion") item.append(el("span", "hl hl-opinion", "Opinion"));
+    else item.append(el("span", `hl hl-fact hl-${verdict}`, verdictLabel(verdict)));
     key.append(item);
   }
-  const opinionItem = el("li");
-  opinionItem.append(el("span", "hl hl-opinion", "Opinion"));
-  key.append(opinionItem);
   section.append(key);
   section.append(
     el(
       "p",
       "legend-note",
-      "Ranked from most true (teal) to least true (red). Opinions stay copper and are not given those verdicts.",
+      "Ranked from most true (teal) to least true (red). Opinions sit in the middle in copper and are not labeled true or false.",
     ),
   );
   return section;
@@ -376,10 +374,7 @@ function markCurrent(id) {
 let hashBound = false;
 
 export function renderResults(container, report) {
-  // "Contradicted" is shown as "Conflicting" (one label for both).
-  const claims = (Array.isArray(report?.claims) ? report.claims : []).map((c) =>
-    c && c.verdict === "contradicted" ? { ...c, verdict: "conflicting" } : c,
-  );
+  const claims = Array.isArray(report?.claims) ? report.claims : [];
   const text = typeof report?.input_text === "string" ? report.input_text : "";
   container.replaceChildren();
 
