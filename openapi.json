@@ -1,0 +1,184 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "FactCheck API",
+    "version": "0.0.0-stub",
+    "description": "Stub specification. No server is implemented.\n\nThe check operation splits an AI-generated answer into claims. A fact is supported only when a quoted source passage or a tool result backs it. Opinions are not labeled true or false: read mainstream_check for what mainstream fact-checkers say, and do not present verdict on an opinion as a truth stamp. strength_of_support is the strength of the evidence for that claim, from 0 to 1. The report has no overall score."
+  },
+  "servers": [
+    {
+      "url": ".",
+      "description": "Not deployed. Relative to this document so a project-site subfolder still resolves."
+    }
+  ],
+  "paths": {
+    "/check": {
+      "post": {
+        "operationId": "checkClaims",
+        "summary": "Check claims in an AI-generated answer",
+        "description": "Not implemented. The static site calls a local stub with the same request body.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["text"],
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "description": "The AI-generated answer or claim to check."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A claim-by-claim report.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckReport"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "This static site does not implement the endpoint."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CheckReport": {
+        "type": "object",
+        "required": ["claims"],
+        "properties": {
+          "input_text": {
+            "type": "string",
+            "description": "The text that was checked."
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Claim"
+            }
+          }
+        }
+      },
+      "Claim": {
+        "type": "object",
+        "required": [
+          "claim",
+          "claim_type",
+          "claim_category",
+          "verdict",
+          "strength_of_support",
+          "sources"
+        ],
+        "properties": {
+          "claim": {
+            "type": "string"
+          },
+          "claim_type": {
+            "type": "string",
+            "enum": ["fact", "opinion"]
+          },
+          "claim_category": {
+            "type": "string",
+            "description": "Short category such as event, measurement, scientific, quantity, prediction, or policy."
+          },
+          "verdict": {
+            "type": "string",
+            "enum": ["supported", "contradicted", "unverified", "conflicting", "hypothesis"],
+            "description": "For opinions, do not render this as true or false. Use mainstream_check."
+          },
+          "strength_of_support": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "How strongly the evidence supports this claim. Not an overall score for the answer."
+          },
+          "start": {
+            "type": "integer",
+            "description": "Optional start offset of the claim in input_text."
+          },
+          "end": {
+            "type": "integer",
+            "description": "Optional end offset of the claim in input_text."
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Source"
+            }
+          },
+          "mainstream_check": {
+            "$ref": "#/components/schemas/MainstreamCheck"
+          }
+        }
+      },
+      "Source": {
+        "type": "object",
+        "required": ["url", "quote", "source_type"],
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "quote": {
+            "type": "string"
+          },
+          "source_type": {
+            "type": "string",
+            "description": "For example primary_document, audit_report, fact_checker, or tool_result."
+          },
+          "title": {
+            "type": "string"
+          },
+          "checked_on": {
+            "type": "string",
+            "format": "date",
+            "description": "Day the source was checked."
+          }
+        }
+      },
+      "MainstreamCheck": {
+        "type": "object",
+        "description": "What mainstream fact-checkers say about an opinion. Not a true or false stamp.",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "publisher": {
+                  "type": "string"
+                },
+                "rating_label": {
+                  "type": "string",
+                  "description": "The fact-checker's own rating words."
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "quote": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+# FactCheck
+
+> Splits an AI-generated answer into claims. Facts are supported only by a quoted passage or a tool result. Opinions are reported as what mainstream fact-checkers say, never as true or false. Strength of support is per claim, from the evidence. There is no overall score. This file is a stub. The check API is not live.
+
+The home page offers one free check with no sign-up. The button calls a local stub and returns placeholder results. Nothing is uploaded.
+
+## Pages
+
+- [Home](index.html): Paste an answer and check it
+- [How it works](how-it-works/): Placeholder
+- [For AI agents](for-agents/): Placeholder
+- [Pricing](pricing/): Placeholder
+- [Terms](terms/): Placeholder
+- [Privacy](privacy/): Placeholder
+
+## Machine-readable
+
+- [OpenAPI stub](openapi.json): the check operation
+- [Agent card](.well-known/agent-card.json): Placeholder discovery card
+- [MCP stub](.well-known/mcp.json): Placeholder plug-in manifest

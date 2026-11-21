@@ -1,0 +1,16 @@
+{
+  "schema_version": "0.1-stub",
+  "name": "FactCheck",
+  "status": "placeholder",
+  "description": "A future MCP plug-in will expose a check tool. Nothing here is callable.",
+  "tools": [
+    {
+      "name": "check",
+      "description": "Split an AI-generated answer into claims and return fact and opinion checks. Not implemented.",
+      "status": "not_implemented",
+      "input": {
+        "text": "string"
+      }
+    }
+  ]
+}
