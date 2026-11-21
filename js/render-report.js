@@ -14,8 +14,8 @@ const CATEGORIES = {
 };
 
 const VERDICT_LABELS = {
-  supported: "Fact",
-  contradicted: "False",
+  supported: "Supported",
+  contradicted: "Conflicting",
   unverified: "Unverified",
   conflicting: "Conflicting",
   hypothesis: "Hypothesis",
@@ -325,7 +325,7 @@ function renderLegend() {
   fact.append(el("strong", null, "Claims"));
   fact.append(
     document.createTextNode(
-      " Colored from teal (most true) to red (least true). Marked Fact only when a quoted source or tool result backs it.",
+      " Colored from teal (most true) to red (least true). Marked Supported only when a quoted source or tool result backs it.",
     ),
   );
   const opinion = el("p", "swatch swatch-opinion");
@@ -339,7 +339,7 @@ function renderLegend() {
   section.append(grid);
 
   const key = el("ul", "verdict-key");
-  for (const verdict of ["supported", "hypothesis", "opinion", "conflicting", "contradicted", "unverified"]) {
+  for (const verdict of ["supported", "hypothesis", "opinion", "conflicting", "unverified"]) {
     const item = el("li");
     if (verdict === "opinion") item.append(el("span", "hl hl-opinion", "Opinion"));
     else item.append(el("span", `hl hl-fact hl-${verdict}`, verdictLabel(verdict)));
@@ -374,7 +374,10 @@ function markCurrent(id) {
 let hashBound = false;
 
 export function renderResults(container, report) {
-  const claims = Array.isArray(report?.claims) ? report.claims : [];
+  // Contradicted claims are shown as "Conflicting".
+  const claims = (Array.isArray(report?.claims) ? report.claims : []).map((c) =>
+    c && c.verdict === "contradicted" ? { ...c, verdict: "conflicting" } : c,
+  );
   const text = typeof report?.input_text === "string" ? report.input_text : "";
   container.replaceChildren();
 

@@ -3,13 +3,12 @@ const VERDICT_ORDER = [
   "hypothesis",
   "opinion",
   "conflicting",
-  "contradicted",
   "unverified",
 ];
 
 const VERDICT_WORDS = {
-  supported: ["fact", "facts"],
-  contradicted: ["false", "false"],
+  supported: ["supported", "supported"],
+  contradicted: ["conflicting", "conflicting"],
   unverified: ["unverified", "unverified"],
   conflicting: ["conflicting", "conflicting"],
   hypothesis: ["hypothesis", "hypotheses"],
@@ -29,7 +28,7 @@ export function summarize(claims) {
       opinions += 1;
       continue;
     }
-    const v = claim.verdict;
+    const v = claim.verdict === "contradicted" ? "conflicting" : claim.verdict;
     if (Object.prototype.hasOwnProperty.call(counts, v)) {
       counts[v] += 1;
     }
