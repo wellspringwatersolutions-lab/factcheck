@@ -3,7 +3,6 @@ const VERDICT_ORDER = [
   "hypothesis",
   "conflicting",
   "unverified",
-  "contradicted",
 ];
 
 const VERDICT_WORDS = {
@@ -28,8 +27,9 @@ export function summarize(claims) {
       opinions += 1;
       continue;
     }
-    if (Object.prototype.hasOwnProperty.call(counts, claim.verdict)) {
-      counts[claim.verdict] += 1;
+    const v = claim.verdict === "contradicted" ? "conflicting" : claim.verdict;
+    if (Object.prototype.hasOwnProperty.call(counts, v)) {
+      counts[v] += 1;
     }
   }
   return { counts, opinions };

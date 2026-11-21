@@ -339,7 +339,7 @@ function renderLegend() {
   section.append(grid);
 
   const key = el("ul", "verdict-key");
-  for (const verdict of ["supported", "hypothesis", "conflicting", "unverified", "contradicted"]) {
+  for (const verdict of ["supported", "hypothesis", "conflicting", "unverified"]) {
     const item = el("li");
     item.append(el("span", `hl hl-fact hl-${verdict}`, verdictLabel(verdict)));
     key.append(item);
@@ -376,7 +376,10 @@ function markCurrent(id) {
 let hashBound = false;
 
 export function renderResults(container, report) {
-  const claims = Array.isArray(report?.claims) ? report.claims : [];
+  // "Contradicted" is shown as "Conflicting" (one label for both).
+  const claims = (Array.isArray(report?.claims) ? report.claims : []).map((c) =>
+    c && c.verdict === "contradicted" ? { ...c, verdict: "conflicting" } : c,
+  );
   const text = typeof report?.input_text === "string" ? report.input_text : "";
   container.replaceChildren();
 
