@@ -28,11 +28,17 @@
   --opinion-wash: #f6e4cf;
   --opinion-700: #8a4b08;
   --opinion-ink: #4a2804;
-  --supported: #0c5a40;
-  --contradicted: #7a2424;
-  --unverified: #3f3a33;
-  --conflicting: #5c4610;
-  --hypothesis: #1a455e;
+  /* Verdict scale, worst (red) to best (teal) */
+  --contradicted: #8f1d1d;
+  --unverified: #b42318;
+  --conflicting: #b54708;
+  --hypothesis: #8a6d00;
+  --supported: #0f6b6b;
+  --contradicted-wash: #f9d9d6;
+  --unverified-wash: #fde4e1;
+  --conflicting-wash: #fde9d4;
+  --hypothesis-wash: #f8f0c8;
+  --supported-wash: #d3ebea;
   --shadow: 0 1px 2px rgba(28, 25, 21, 0.05), 0 16px 40px rgba(28, 25, 21, 0.06);
   color-scheme: light;
 }
@@ -450,30 +456,31 @@ a.hl.is-current {
 }
 
 .hl-fact.hl-supported {
+  background-color: var(--supported-wash);
   box-shadow: inset 0 -3px 0 var(--supported);
 }
 
 .hl-fact.hl-contradicted {
-  background-color: #d7e4e8;
+  background-color: var(--contradicted-wash);
   box-shadow: inset 0 -3px 0 var(--contradicted);
 }
 
 .hl-fact.hl-unverified {
-  background-color: #e7f1f2;
+  background-color: var(--unverified-wash);
   box-shadow: none;
-  background-image: radial-gradient(circle, var(--fact-700) 1px, transparent 1.2px);
+  background-image: radial-gradient(circle, var(--unverified) 1px, transparent 1.2px);
   background-size: 6px 2px;
   background-repeat: repeat-x;
   background-position: left bottom;
 }
 
 .hl-fact.hl-conflicting {
-  background-color: #d7e6ea;
+  background-color: var(--conflicting-wash);
   box-shadow: inset 0 -3px 0 var(--conflicting);
 }
 
 .hl-fact.hl-hypothesis {
-  background-color: #d9e6ee;
+  background-color: var(--hypothesis-wash);
   box-shadow: none;
   background-image: repeating-linear-gradient(90deg, var(--hypothesis) 0 6px, transparent 6px 10px);
   background-size: auto 2px;
@@ -568,6 +575,12 @@ a.hl.is-current {
 .verdict-unverified { color: var(--unverified); }
 .verdict-conflicting { color: var(--conflicting); }
 .verdict-hypothesis { color: var(--hypothesis); }
+
+.card-fact.card-v-supported { border-top-color: var(--supported); }
+.card-fact.card-v-hypothesis { border-top-color: var(--hypothesis); }
+.card-fact.card-v-conflicting { border-top-color: var(--conflicting); }
+.card-fact.card-v-unverified { border-top-color: var(--unverified); }
+.card-fact.card-v-contradicted { border-top-color: var(--contradicted); }
 
 .reading,
 .empty-record,

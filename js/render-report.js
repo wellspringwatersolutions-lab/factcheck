@@ -295,7 +295,10 @@ function renderOpinionBody(card, claim) {
 
 function renderCard(claim) {
   const opinion = claim.claim_type === "opinion";
-  const card = el("article", opinion ? "card card-opinion" : "card card-fact");
+  const card = el(
+    "article",
+    opinion ? "card card-opinion" : `card card-fact card-v-${claim.verdict || "unverified"}`,
+  );
   card.id = `claim-${claim.id}`;
   card.tabIndex = -1;
   const kicker = el(
@@ -322,7 +325,7 @@ function renderLegend() {
   fact.append(el("strong", null, "Fact"));
   fact.append(
     document.createTextNode(
-      " Teal. Checked against a quoted source or a tool result. Supported only when that quote backs the claim.",
+      " Colored from red to teal by how well it holds up. Supported only when a quoted source or tool result backs it.",
     ),
   );
   const opinion = el("p", "swatch swatch-opinion");
@@ -336,7 +339,7 @@ function renderLegend() {
   section.append(grid);
 
   const key = el("ul", "verdict-key");
-  for (const verdict of ["supported", "contradicted", "unverified", "conflicting", "hypothesis"]) {
+  for (const verdict of ["unverified", "contradicted", "conflicting", "hypothesis", "supported"]) {
     const item = el("li");
     item.append(el("span", `hl hl-fact hl-${verdict}`, verdictLabel(verdict)));
     key.append(item);
@@ -349,7 +352,7 @@ function renderLegend() {
     el(
       "p",
       "legend-note",
-      "Facts stay in the teal family. The underline marks the verdict. Opinions stay copper and are not given those verdicts.",
+      "Facts run from red (worst) to teal (best). Opinions stay copper and are not given those verdicts.",
     ),
   );
   return section;
