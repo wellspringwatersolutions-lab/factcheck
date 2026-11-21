@@ -6,6 +6,9 @@ const TIMEOUT_MS = 90000; // checks can take 20 to 60 seconds
 
 /* Add highlight offsets where a claim's text appears in the pasted answer. */
 function addOffsets(report, input) {
+  // In question mode the claims come from the drafted answer, so highlight that.
+  const draft = report && report.draft_answer && report.draft_answer.text;
+  if (typeof draft === "string" && draft) input = draft;
   report.input_text = input;
   for (const claim of report.claims || []) {
     if (typeof claim.start === "number" && typeof claim.end === "number") continue;

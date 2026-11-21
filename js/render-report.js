@@ -373,6 +373,38 @@ function markCurrent(id) {
 
 let hashBound = false;
 
+const RATING_CLASS = {
+  "Accurate": "supported",
+  "Mostly accurate": "supported",
+  "Mixed": "conflicting",
+  "Mostly inaccurate": "contradicted",
+  "Inaccurate": "contradicted",
+  "Not enough evidence": "unverified",
+};
+
+function renderSynopsis(synopsis) {
+  if (!synopsis || (!synopsis.summary && !synopsis.rating)) return null;
+  const box = el("section", `synopsis synopsis-${RATING_CLASS[synopsis.rating] || "unverified"}`);
+  box.setAttribute("aria-labelledby", "synopsis-title");
+  const title = el("h2", null, "Bottom line");
+  title.id = "synopsis-title";
+  box.append(title);
+  if (synopsis.rating) box.append(el("p", "synopsis-rating", synopsis.rating));
+  if (synopsis.summary) box.append(el("p", "synopsis-summary", synopsis.summary));
+  const caveats = Array.isArray(synopsis.caveats) ? synopsis.caveats.filter(Boolean) : [];
+  if (caveats.length) {
+    const list = el("ul", "synopsis-caveats");
+    for (const c of caveats) list.append(el("li", null, c));
+    box.append(list);
+  }
+  if (synopsis.unchecked_count) {
+    box.append(
+      el("p", "evidence-note", `${synopsis.unchecked_count} claim${synopsis.unchecked_count === 1 ? " was" : "s were"} not checked in this request.`),
+    );
+  }
+  return box;
+}
+
 export function renderResults(container, report) {
   // Contradicted claims are shown as "Conflicting".
   const claims = (Array.isArray(report?.claims) ? report.claims : []).map((c) =>
@@ -419,7 +451,7 @@ export function renderResults(container, report) {
         "This preview returned the sample report. Those claims were not found in the pasted text, so the passage has no highlights.",
       ),
     );
-  } else {
+  } else if (report?.demo) {
     root.append(el("p", "preview-note", "Preview results from the local stub, not a live check."));
   }
 
@@ -427,7 +459,8 @@ export function renderResults(container, report) {
 
   const split = el("div", "split");
   const passageCol = el("div", "passage-col");
-  const passageTitle = el("h2", null, "Pasted text");
+  const isQuestion = report?.mode === "question" && report?.draft_answer;
+  const passageTitle = el("h2", null, isQuestion ? "AI draft answer (checked below)" : "Pasted text");
   passageTitle.id = "passage-title";
   const passage = el("div", "passage");
   passage.setAttribute("aria-labelledby", "passage-title");
@@ -450,7 +483,18 @@ export function renderResults(container, report) {
   for (const claim of claims) cards.append(renderCard(claim));
   cardsCol.append(cardsTitle, cards);
   split.append(passageCol, cardsCol);
+  if (isQuestion) {
+    root.append(
+      el(
+        "p",
+        "evidence-note",
+        `Your question was answered by ${report.draft_answer.model || "an AI model"}, then each claim in that answer was checked against sources. The draft itself is not evidence.`,
+      ),
+    );
+  }
   root.append(split);
+  const synopsis = renderSynopsis(report?.synopsis);
+  if (synopsis) root.append(synopsis);
   container.append(root);
 
   if (!hashBound) {
