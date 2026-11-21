@@ -382,25 +382,35 @@ const RATING_CLASS = {
   "Not enough evidence": "unverified",
 };
 
-function renderSynopsis(synopsis) {
-  if (!synopsis || (!synopsis.summary && !synopsis.rating)) return null;
+function firstSentence(text) {
+  const m = String(text || "").match(/^.*?[.!?](\s|$)/);
+  return (m ? m[0] : String(text || "")).trim();
+}
+
+function renderSynopsis(synopsis, claims) {
+  if (!synopsis || (!synopsis.summary && !synopsis.rating && !synopsis.tldr)) return null;
   const box = el("section", `synopsis synopsis-${RATING_CLASS[synopsis.rating] || "unverified"}`);
   box.setAttribute("aria-labelledby", "synopsis-title");
   const title = el("h2", null, "Bottom line");
   title.id = "synopsis-title";
   box.append(title);
+  let tldr = synopsis.tldr || firstSentence(synopsis.summary);
+  if (synopsis.rating && tldr.replace(/[.\s]+$/, "") === synopsis.rating) tldr = "";
+  if (tldr) box.append(el("p", "synopsis-tldr", tldr));
   if (synopsis.rating) box.append(el("p", "synopsis-rating", synopsis.rating));
-  if (synopsis.summary) box.append(el("p", "synopsis-summary", synopsis.summary));
+  const counts = summaryLine(claims);
+  const unchecked = Number(synopsis.unchecked_count) || 0;
+  const countText = [counts, unchecked ? `${unchecked} not checked` : ""].filter(Boolean).join(", ");
+  if (countText) box.append(el("p", "synopsis-counts", countText));
+  if (synopsis.summary && synopsis.summary.trim() !== tldr) {
+    box.append(el("h3", "synopsis-subhead", "Summary"));
+    box.append(el("p", "synopsis-summary", synopsis.summary));
+  }
   const caveats = Array.isArray(synopsis.caveats) ? synopsis.caveats.filter(Boolean) : [];
   if (caveats.length) {
     const list = el("ul", "synopsis-caveats");
     for (const c of caveats) list.append(el("li", null, c));
     box.append(list);
-  }
-  if (synopsis.unchecked_count) {
-    box.append(
-      el("p", "evidence-note", `${synopsis.unchecked_count} claim${synopsis.unchecked_count === 1 ? " was" : "s were"} not checked in this request.`),
-    );
   }
   return box;
 }
@@ -493,7 +503,7 @@ export function renderResults(container, report) {
     );
   }
   root.append(split);
-  const synopsis = renderSynopsis(report?.synopsis);
+  const synopsis = renderSynopsis(report?.synopsis, claims);
   if (synopsis) root.append(synopsis);
   container.append(root);
 

@@ -977,3 +977,7 @@ blockquote {
 .synopsis-contradicted { border-left-color: var(--contradicted); }
 .synopsis-contradicted .synopsis-rating { color: var(--contradicted); }
 .synopsis-unverified .synopsis-rating { color: var(--unverified); }
+
+.synopsis-tldr { margin: 0 0 8px; font-size: 1.2rem; font-weight: 700; line-height: 1.45; color: var(--ink); }
+.synopsis-counts { margin: 0 0 10px; color: var(--muted); font-size: 0.95rem; }
+.synopsis-subhead { margin: 10px 0 4px; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
