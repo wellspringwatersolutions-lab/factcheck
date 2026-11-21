@@ -94,7 +94,7 @@
           },
           "verdict": {
             "type": "string",
-            "enum": ["supported", "contradicted", "unverified", "conflicting", "hypothesis"],
+            "enum": ["supported", "likely_true", "contradicted", "unverified", "conflicting", "hypothesis"],
             "description": "For opinions, do not render this as true or false. Use mainstream_check."
           },
           "strength_of_support": {

@@ -1,5 +1,6 @@
 const VERDICT_ORDER = [
   "supported",
+  "likely_true",
   "hypothesis",
   "opinion",
   "conflicting",
@@ -8,6 +9,7 @@ const VERDICT_ORDER = [
 
 const VERDICT_WORDS = {
   supported: ["supported", "supported"],
+  likely_true: ["likely true", "likely true"],
   contradicted: ["conflicting", "conflicting"],
   unverified: ["unverified", "unverified"],
   conflicting: ["conflicting", "conflicting"],
@@ -17,6 +19,7 @@ const VERDICT_WORDS = {
 export function summarize(claims) {
   const counts = {
     supported: 0,
+    likely_true: 0,
     contradicted: 0,
     unverified: 0,
     conflicting: 0,

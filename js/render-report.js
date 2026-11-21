@@ -15,6 +15,7 @@ const CATEGORIES = {
 
 const VERDICT_LABELS = {
   supported: "Supported",
+  likely_true: "Likely true",
   contradicted: "Conflicting",
   unverified: "Unverified",
   conflicting: "Conflicting",
@@ -23,6 +24,7 @@ const VERDICT_LABELS = {
 
 const FACT_READING = {
   supported: "A quoted passage backs this claim.",
+  likely_true: "A reputable source backs the substance of this claim.",
   contradicted: "A quoted passage goes against this claim.",
   unverified: "No quoted passage or tool result was found.",
   conflicting: "The quoted sources do not agree with the claim as it was written.",
@@ -110,6 +112,7 @@ function verdictIcon(verdict) {
   path.setAttribute("stroke-linejoin", "round");
   const paths = {
     supported: "M3.2 8.3 6.4 11.5 12.8 4.5",
+    likely_true: "M3.2 8.3 6.4 11.5 12.8 4.5",
     contradicted: "M4 4 L12 12 M12 4 L4 12",
     conflicting: "M3 5.2 h10 M3 10.8 h10",
     hypothesis: "M3.2 8 h8.2 M8.6 4.8 12.2 8 8.6 11.2",
@@ -123,7 +126,10 @@ function categoryLabel(value) {
   return CATEGORIES[value] || value || "Claim";
 }
 
-function verdictLabel(value) {
+function verdictLabel(value, claim) {
+  if (claim && typeof claim.verdict_label === "string" && claim.verdict_label.trim()) {
+    return claim.verdict_label.trim();
+  }
   return VERDICT_LABELS[value] || value || "Unchecked";
 }
 
@@ -175,7 +181,7 @@ function renderPassage(container, text, claims) {
     link.title =
       range.claim.claim_type === "opinion"
         ? "Opinion. Show this claim."
-        : `Claim, ${verdictLabel(range.claim.verdict)}. Show this claim.`;
+        : `Claim, ${verdictLabel(range.claim.verdict, range.claim)}. Show this claim.`;
     link.append(document.createTextNode(text.slice(range.start, range.end)));
     link.append(
       el(
@@ -183,7 +189,7 @@ function renderPassage(container, text, claims) {
         "visually-hidden",
         range.claim.claim_type === "opinion"
           ? " Opinion. Opens the claim card."
-          : ` Claim, ${verdictLabel(range.claim.verdict)}. Opens the claim card.`,
+          : ` Claim, ${verdictLabel(range.claim.verdict, range.claim)}. Opens the claim card.`,
       ),
     );
     paragraph.append(link);
@@ -258,7 +264,7 @@ function renderSource(source, family) {
 function renderFactBody(card, claim) {
   const verdict = el("p", `verdict verdict-${claim.verdict || "unverified"}`);
   verdict.append(verdictIcon(claim.verdict));
-  verdict.append(document.createTextNode(verdictLabel(claim.verdict)));
+  verdict.append(document.createTextNode(verdictLabel(claim.verdict, claim)));
   card.append(verdict);
   card.append(el("p", "reading", FACT_READING[claim.verdict] || ""));
   const strength = renderStrength(claim);
@@ -339,7 +345,7 @@ function renderLegend() {
   section.append(grid);
 
   const key = el("ul", "verdict-key");
-  for (const verdict of ["supported", "hypothesis", "opinion", "conflicting", "unverified"]) {
+  for (const verdict of ["supported", "likely_true", "hypothesis", "opinion", "conflicting", "unverified"]) {
     const item = el("li");
     if (verdict === "opinion") item.append(el("span", "hl hl-opinion", "Opinion"));
     else item.append(el("span", `hl hl-fact hl-${verdict}`, verdict === "hypothesis" ? "Hypothesis (supported by evidence)" : verdictLabel(verdict)));
@@ -376,6 +382,8 @@ let hashBound = false;
 const RATING_CLASS = {
   "Accurate": "supported",
   "Mostly accurate": "supported",
+  "Likely true": "likely_true",
+  "Likely accurate": "likely_true",
   "Mixed": "conflicting",
   "Mostly inaccurate": "contradicted",
   "Inaccurate": "contradicted",
@@ -418,7 +426,7 @@ function renderSynopsis(synopsis, claims) {
 export function renderResults(container, report) {
   // Contradicted claims are shown as "Conflicting".
   const claims = (Array.isArray(report?.claims) ? report.claims : []).map((c) =>
-    c && c.verdict === "contradicted" ? { ...c, verdict: "conflicting" } : c,
+    c && c.verdict === "contradicted" ? { ...c, verdict: "conflicting", verdict_label: "Conflicting" } : c,
   );
   const text = typeof report?.input_text === "string" ? report.input_text : "";
   container.replaceChildren();
