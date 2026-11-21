@@ -25,20 +25,20 @@
   --fact-700: #0f4c5c;
   --fact-ink: #083038;
   --opinion-50: #f8efe4;
-  --opinion-wash: #f6e4cf;
-  --opinion-700: #8a4b08;
+  --opinion-wash: #ecd3b8;
+  --opinion-700: #9a5524;
   --opinion-ink: #4a2804;
-  /* Verdict scale, worst (red) to best (teal) */
-  --contradicted: #8f1d1d;
-  --unverified: #b42318;
-  --conflicting: #b54708;
-  --hypothesis: #8a6d00;
-  --supported: #0f6b6b;
-  --contradicted-wash: #f9d9d6;
-  --unverified-wash: #fde4e1;
-  --conflicting-wash: #fde9d4;
-  --hypothesis-wash: #f8f0c8;
-  --supported-wash: #d3ebea;
+  /* Verdict scale, left to right gets darker: teal to red */
+  --supported: #2f9488;
+  --hypothesis: #9a7a12;
+  --conflicting: #9a3a18;
+  --unverified: #8a1a1a;
+  --contradicted: #8a1a1a;
+  --supported-wash: #dcefec;
+  --hypothesis-wash: #f1e6bf;
+  --conflicting-wash: #ebc4b4;
+  --unverified-wash: #e8b4b0;
+  --contradicted-wash: #e8b4b0;
   --shadow: 0 1px 2px rgba(28, 25, 21, 0.05), 0 16px 40px rgba(28, 25, 21, 0.06);
   color-scheme: light;
 }

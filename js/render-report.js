@@ -26,7 +26,7 @@ const FACT_READING = {
   contradicted: "A quoted passage goes against this claim.",
   unverified: "No quoted passage or tool result was found.",
   conflicting: "The quoted sources do not agree with the claim as it was written.",
-  hypothesis: "A prediction. The quoted passage does not establish it.",
+  hypothesis: "Supported by evidence, but not proven yet.",
 };
 
 const SOURCE_TYPES = {
@@ -342,7 +342,7 @@ function renderLegend() {
   for (const verdict of ["supported", "hypothesis", "opinion", "conflicting", "unverified"]) {
     const item = el("li");
     if (verdict === "opinion") item.append(el("span", "hl hl-opinion", "Opinion"));
-    else item.append(el("span", `hl hl-fact hl-${verdict}`, verdictLabel(verdict)));
+    else item.append(el("span", `hl hl-fact hl-${verdict}`, verdict === "hypothesis" ? "Hypothesis (supported by evidence)" : verdictLabel(verdict)));
     key.append(item);
   }
   section.append(key);
