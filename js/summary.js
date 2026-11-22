@@ -1,6 +1,5 @@
 const VERDICT_ORDER = [
   "supported",
-  "likely_true",
   "hypothesis",
   "opinion",
   "conflicting",
@@ -9,8 +8,6 @@ const VERDICT_ORDER = [
 
 const VERDICT_WORDS = {
   supported: ["supported", "supported"],
-  likely_true: ["likely true", "likely true"],
-  contradicted: ["conflicting", "conflicting"],
   unverified: ["unverified", "unverified"],
   conflicting: ["conflicting", "conflicting"],
   hypothesis: ["hypothesis", "hypotheses"],
@@ -19,8 +16,6 @@ const VERDICT_WORDS = {
 export function summarize(claims) {
   const counts = {
     supported: 0,
-    likely_true: 0,
-    contradicted: 0,
     unverified: 0,
     conflicting: 0,
     hypothesis: 0,
@@ -31,7 +26,8 @@ export function summarize(claims) {
       opinions += 1;
       continue;
     }
-    const v = claim.verdict === "contradicted" ? "conflicting" : claim.verdict;
+    const raw = String(claim.verdict || "").toLowerCase();
+    const v = raw === "contradicted" ? "conflicting" : raw === "likely_true" ? "hypothesis" : raw;
     if (Object.prototype.hasOwnProperty.call(counts, v)) {
       counts[v] += 1;
     }

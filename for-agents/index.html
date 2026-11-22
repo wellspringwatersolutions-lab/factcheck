@@ -57,12 +57,12 @@ Content-Type: application/json
     <p>In this order, from strongest support to least:</p>
     <ul>
       <li>supported</li>
-      <li>hypothesis (supported by evidence)</li>
+      <li>hypothesis (backed by a reputable source, or supported by evidence but not proven)</li>
       <li>opinion</li>
       <li>conflicting</li>
       <li>unverified</li>
     </ul>
-    <p>Do not label an opinion true or false. The API may still return the value <code>contradicted</code>; treat that as conflicting.</p>
+    <p>Do not label an opinion true or false. Older results may still use <code>likely_true</code> (now hypothesis) or <code>contradicted</code> (now conflicting). Newer results keep that detail in <code>verdict_detail</code>: <code>likely_true</code> means a reputable source backs the claim, <code>speculative</code> means it is not established, and <code>contradicted</code> means sources go against it.</p>
   </main>
   <footer class="site-footer">
     <nav aria-label="Footer">

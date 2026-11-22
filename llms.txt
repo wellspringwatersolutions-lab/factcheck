@@ -43,12 +43,12 @@ One free check per client, with no sign-up and no key. Paid plans are coming soo
 In this order, from strongest support to least:
 
 - supported
-- hypothesis (supported by evidence)
+- hypothesis (backed by a reputable source, or supported by evidence but not proven)
 - opinion
 - conflicting
 - unverified
 
-Do not label an opinion true or false. The API may still return the value `contradicted`; treat that as conflicting.
+Do not label an opinion true or false. Older results may still use `likely_true` (now hypothesis) or `contradicted` (now conflicting). Newer results keep that detail in `verdict_detail`: `likely_true` means a reputable source backs the claim, `speculative` means it is not established, and `contradicted` means sources go against it.
 
 ## Pages
 

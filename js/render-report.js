@@ -15,8 +15,6 @@ const CATEGORIES = {
 
 const VERDICT_LABELS = {
   supported: "Supported",
-  likely_true: "Likely true",
-  contradicted: "Conflicting",
   unverified: "Unverified",
   conflicting: "Conflicting",
   hypothesis: "Hypothesis",
@@ -24,12 +22,39 @@ const VERDICT_LABELS = {
 
 const FACT_READING = {
   supported: "A quoted passage backs this claim.",
-  likely_true: "A reputable source backs the substance of this claim.",
-  contradicted: "A quoted passage goes against this claim.",
   unverified: "No quoted passage or tool result was found.",
   conflicting: "The quoted sources do not agree with the claim as it was written.",
   hypothesis: "Supported by evidence, but not proven yet.",
 };
+
+// Notes shown under the verdict for the API's verdict_detail values.
+const DETAIL_NOTES = {
+  likely_true: "Backed by a reputable source",
+  contradicted: "Contradicted by sources",
+};
+
+const PUBLIC_VERDICTS = new Set(["supported", "hypothesis", "opinion", "conflicting", "unverified"]);
+
+// Older stored results used likely_true and contradicted as verdicts.
+// Map them onto the five public verdicts and keep the old value as verdict_detail.
+function normalizeClaim(claim) {
+  if (!claim || typeof claim !== "object") return claim;
+  const raw = String(claim.verdict || "").toLowerCase();
+  if (raw === "likely_true") {
+    return { ...claim, verdict: "hypothesis", verdict_detail: claim.verdict_detail || "likely_true", verdict_label: "Hypothesis" };
+  }
+  if (raw === "contradicted") {
+    return { ...claim, verdict: "conflicting", verdict_detail: claim.verdict_detail || "contradicted", verdict_label: "Conflicting" };
+  }
+  if (claim.claim_type !== "opinion" && raw && !PUBLIC_VERDICTS.has(raw)) {
+    return { ...claim, verdict: "unverified" };
+  }
+  return raw && raw !== claim.verdict ? { ...claim, verdict: raw } : claim;
+}
+
+function detailClass(claim) {
+  return claim && DETAIL_NOTES[claim.verdict_detail] ? ` detail-${claim.verdict_detail}` : "";
+}
 
 const SOURCE_TYPES = {
   primary_document: "Primary document",
@@ -112,8 +137,6 @@ function verdictIcon(verdict) {
   path.setAttribute("stroke-linejoin", "round");
   const paths = {
     supported: "M3.2 8.3 6.4 11.5 12.8 4.5",
-    likely_true: "M3.2 8.3 6.4 11.5 12.8 4.5",
-    contradicted: "M4 4 L12 12 M12 4 L4 12",
     conflicting: "M3 5.2 h10 M3 10.8 h10",
     hypothesis: "M3.2 8 h8.2 M8.6 4.8 12.2 8 8.6 11.2",
   };
@@ -208,7 +231,7 @@ function renderPassage(container, text, claims) {
 
 function highlightClass(claim) {
   if (claim.claim_type === "opinion") return "hl hl-opinion";
-  return `hl hl-fact hl-${claim.verdict || "unverified"}`;
+  return `hl hl-fact hl-${claim.verdict || "unverified"}${detailClass(claim)}`;
 }
 
 function renderStrength(claim) {
@@ -262,10 +285,12 @@ function renderSource(source, family) {
 }
 
 function renderFactBody(card, claim) {
-  const verdict = el("p", `verdict verdict-${claim.verdict || "unverified"}`);
+  const verdict = el("p", `verdict verdict-${claim.verdict || "unverified"}${detailClass(claim)}`);
   verdict.append(verdictIcon(claim.verdict));
   verdict.append(document.createTextNode(verdictLabel(claim.verdict, claim)));
   card.append(verdict);
+  const note = DETAIL_NOTES[claim.verdict_detail];
+  if (note) card.append(el("p", `verdict-note${detailClass(claim)}`, note));
   card.append(el("p", "reading", FACT_READING[claim.verdict] || ""));
   const strength = renderStrength(claim);
   if (strength) card.append(strength);
@@ -303,7 +328,7 @@ function renderCard(claim) {
   const opinion = claim.claim_type === "opinion";
   const card = el(
     "article",
-    opinion ? "card card-opinion" : `card card-fact card-v-${claim.verdict || "unverified"}`,
+    opinion ? "card card-opinion" : `card card-fact card-v-${claim.verdict || "unverified"}${detailClass(claim)}`,
   );
   card.id = `claim-${claim.id}`;
   card.tabIndex = -1;
@@ -345,7 +370,7 @@ function renderLegend() {
   section.append(grid);
 
   const key = el("ul", "verdict-key");
-  for (const verdict of ["supported", "likely_true", "hypothesis", "opinion", "conflicting", "unverified"]) {
+  for (const verdict of ["supported", "hypothesis", "opinion", "conflicting", "unverified"]) {
     const item = el("li");
     if (verdict === "opinion") item.append(el("span", "hl hl-opinion", "Opinion"));
     else item.append(el("span", `hl hl-fact hl-${verdict}`, verdict === "hypothesis" ? "Hypothesis (supported by evidence)" : verdictLabel(verdict)));
@@ -382,11 +407,10 @@ let hashBound = false;
 const RATING_CLASS = {
   "Accurate": "supported",
   "Mostly accurate": "supported",
-  "Likely true": "likely_true",
-  "Likely accurate": "likely_true",
+  "Partly verified": "hypothesis",
   "Mixed": "conflicting",
-  "Mostly inaccurate": "contradicted",
-  "Inaccurate": "contradicted",
+  "Mostly inaccurate": "conflicting",
+  "Inaccurate": "conflicting",
   "Not enough evidence": "unverified",
 };
 
@@ -424,10 +448,8 @@ function renderSynopsis(synopsis, claims) {
 }
 
 export function renderResults(container, report) {
-  // Contradicted claims are shown as "Conflicting".
-  const claims = (Array.isArray(report?.claims) ? report.claims : []).map((c) =>
-    c && c.verdict === "contradicted" ? { ...c, verdict: "conflicting", verdict_label: "Conflicting" } : c,
-  );
+  // Only the five public verdicts are shown; older values are mapped onto them.
+  const claims = (Array.isArray(report?.claims) ? report.claims : []).map(normalizeClaim);
   const text = typeof report?.input_text === "string" ? report.input_text : "";
   container.replaceChildren();
 

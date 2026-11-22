@@ -462,8 +462,9 @@ a.hl.is-current {
   box-shadow: inset 0 -3px 0 var(--supported);
 }
 
-.hl-fact.hl-likely_true {
+.hl-fact.hl-hypothesis.detail-likely_true {
   background-color: var(--likely-true-wash);
+  background-image: none;
   box-shadow: inset 0 -3px 0 var(--likely-true);
 }
 
@@ -578,14 +579,17 @@ a.hl.is-current {
 }
 
 .verdict-supported { color: var(--supported); }
-.verdict-likely_true { color: var(--likely-true); }
+.verdict-hypothesis.detail-likely_true { color: var(--likely-true); }
+.verdict-note { margin: 2px 0 0; font-size: 0.85rem; font-weight: 600; }
+.verdict-note.detail-likely_true { color: var(--likely-true); }
+.verdict-note.detail-contradicted { color: var(--contradicted); }
 .verdict-contradicted { color: var(--contradicted); }
 .verdict-unverified { color: var(--unverified); }
 .verdict-conflicting { color: var(--conflicting); }
 .verdict-hypothesis { color: var(--hypothesis); }
 
 .card-fact.card-v-supported { border-top-color: var(--supported); }
-.card-fact.card-v-likely_true { border-top-color: var(--likely-true); }
+.card-fact.card-v-hypothesis.detail-likely_true { border-top-color: var(--likely-true); }
 .card-fact.card-v-hypothesis { border-top-color: var(--hypothesis); }
 .card-fact.card-v-conflicting { border-top-color: var(--conflicting); }
 .card-fact.card-v-unverified { border-top-color: var(--unverified); }
@@ -1036,8 +1040,8 @@ blockquote {
 .synopsis-caveats { margin: 0 0 6px; padding-left: 1.2rem; }
 .synopsis-supported { border-left-color: var(--supported); }
 .synopsis-supported .synopsis-rating { color: var(--supported); }
-.synopsis-likely_true { border-left-color: var(--likely-true); }
-.synopsis-likely_true .synopsis-rating { color: var(--likely-true); }
+.synopsis-hypothesis { border-left-color: var(--hypothesis); }
+.synopsis-hypothesis .synopsis-rating { color: var(--hypothesis); }
 .synopsis-conflicting { border-left-color: var(--conflicting); }
 .synopsis-conflicting .synopsis-rating { color: var(--conflicting); }
 .synopsis-contradicted { border-left-color: var(--contradicted); }
